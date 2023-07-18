@@ -1,3 +1,9 @@
 *.csv
+*.tsv
+*.zip
+*.fna
+*.fai
 *.json
+*.txt
+*.bed
 venv_bio/*

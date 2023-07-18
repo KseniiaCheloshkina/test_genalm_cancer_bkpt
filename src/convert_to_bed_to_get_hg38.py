@@ -124,10 +124,10 @@ def get_full_dataset(
     result_file: str,
     out_file: str,
 ) -> None:
-    """ Add as columns coordinates of hg38 in source dataset
+    """Add as columns coordinates of hg38 in source dataset
 
     Args:
-        initial_bkpt_path (str): initial file with breakpoints data 
+        initial_bkpt_path (str): initial file with breakpoints data
         init_file (str): list of hg19 coordinates from function `prepare_file_for_convertation`
         err_file (str): file with conversion errors
         result_file (str): result file with hg38 coordinates
@@ -151,17 +151,17 @@ def get_full_dataset(
 
 if __name__ == "__main__":
     initial_bkpt_path = "../cancer_breakpoints_hotspots_prediction/data/raw breakpoints/all_cancer_data_eda.csv"
-    
+
     ## STEP 1.
     # create file to convert to hg38
     # prepare_file_for_convertation(
     #     filepath=initial_bkpt_path,
     #     out_file="data/hg19_breakpoints.txt"
     # )
-    
+
     # then upload this file to site https://genome.ucsc.edu/cgi-bin/hgLiftOver
     # Result: Successfully converted 472429 records. Conversion failed on 144 records
-    
+
     ## STEP 2.
     # merge error file
     get_full_dataset(
