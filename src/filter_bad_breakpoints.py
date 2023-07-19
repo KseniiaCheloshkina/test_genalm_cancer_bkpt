@@ -106,7 +106,7 @@ def filter_bad_regions(
     df_bkpt = (
         pd.read_csv(breakpoints_path)[["hg38_chr", "hg38_coord"]]
         .rename(columns={"hg38_chr": "chr", "hg38_coord": "start"})
-        .assign(end = lambda x: x['start'] + 1)
+        .assign(end=lambda x: x['start'] + 1)
     )
     df_bkpt['chr'] = df_bkpt['chr'].astype(str)
 

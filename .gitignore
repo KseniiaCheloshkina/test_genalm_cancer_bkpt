@@ -7,3 +7,4 @@
 *.txt
 *.bed
 venv_bio/*
+*.pyc
