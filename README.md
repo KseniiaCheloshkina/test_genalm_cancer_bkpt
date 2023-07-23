@@ -7,6 +7,7 @@ Methods to get DNA sequence by coordinates in genome:
 ```python
 from pyfaidx import Fasta
 seq = Fasta("data/ncbi_dataset/ncbi_dataset/data/GCA_000001405.15/GCA_000001405.15_GRCh38_genomic.fna")
+# awk '{print $1,$2-1, $2}' records.txt | xargs faidx hg19.fa --bed - --transform transposed
 ```
 * pybedtools
 * ucsc
