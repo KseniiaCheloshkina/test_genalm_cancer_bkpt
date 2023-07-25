@@ -1,4 +1,5 @@
 ## Data Sources
+Breakpoints data - https://github.com/KseniiaCheloshkina/cancer_breakpoints_hotspots_prediction/tree/master/data/raw%20breakpoints
 Genome sequence - https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/
 Chromosome lengths - https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/
 

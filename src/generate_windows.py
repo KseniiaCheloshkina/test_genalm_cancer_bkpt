@@ -39,11 +39,11 @@ def get_positive_windows(csv_path: str, win_len: int) -> None:
     df["win_start"] = [el[0] for el in all_seq]
     df["win_end"] = [el[1] for el in all_seq]
     df["dna_seq"] = [el[2] for el in all_seq]    
-    df.to_csv(csv_path.replace(".csv", f"_{win_len}.csv"))
     df = df[["chr", "start", "win_start", "win_end", "dna_seq", "cancer_type"]]
     df = df.rename(columns={"start": "position", "chr": "chromosome"})
     df["label"] = 1
-    print("With N: ", df[df["sequence"].str.contains("N")].shape[0])    
+    print("With N: ", df[df["dna_seq"].str.contains("N")].shape[0])    
+    df.to_csv(csv_path.replace(".csv", f"_{win_len}.csv"))
     return df
 
 
