@@ -24,25 +24,26 @@ def get_sequence(chrom: str, start: str, end: str) -> str:
 
 
 def get_positive_windows(csv_path: str, win_len: int) -> None:
-    # output: cancer type, chromosome, win_start, win_end, position, dna_seq, label
     df = pd.read_csv(csv_path)
     all_seq = []
     for _, bkpt in tqdm.tqdm(df.iterrows()):
         win_start, win_end = generate_window(
             chrom=bkpt["chr"], pos=int(bkpt["start"]), win_len=win_len
         )
-        dna_seq = get_sequence(
-            chrom=bkpt["chr"], start=str(win_start), end=str(win_end)
-        )
+        # TODO: fix
+        # dna_seq = get_sequence(
+        #     chrom=bkpt["chr"], start=str(win_start), end=str(win_end)
+        # )
+        dna_seq = "a"
         all_seq.append((win_start, win_end, dna_seq))
     df["win_start"] = [el[0] for el in all_seq]
     df["win_end"] = [el[1] for el in all_seq]
-    df["dna_seq"] = [el[2] for el in all_seq]
+    df["dna_seq"] = [el[2] for el in all_seq]    
     df.to_csv(csv_path.replace(".csv", f"_{win_len}.csv"))
-    df = df[["chr", "start", "win_start", "win_end", "dna_seq"]]
+    df = df[["chr", "start", "win_start", "win_end", "dna_seq", "cancer_type"]]
     df = df.rename(columns={"start": "position", "chr": "chromosome"})
     df["label"] = 1
-    print("With N: ", df[df["sequence"].str.contains("N")].shape[0])
+    print("With N: ", df[df["sequence"].str.contains("N")].shape[0])    
     return df
 
 
@@ -81,7 +82,7 @@ if __name__ == "__main__":
         "--win_len", help="length of window to generate", default=512, type=int
     )
     args = parser.parse_args()
-    # df_new = get_positive_windows(csv_path="data/breakpoints_wo_bad_regions.csv", win_len=args.win_len)
-    df_new = get_negative_windows(n_points=40, win_len=args.win_len)
-    print(df_new.head())
-    df_new.to_csv("data/tmp.csv")
+    df_new = get_positive_windows(csv_path="data/breakpoints_wo_bad_regions.csv", win_len=args.win_len)
+    # df_new = get_negative_windows(n_points=40, win_len=args.win_len)
+    # print(df_new.head())
+    # df_new.to_csv("data/tmp.csv")

@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import pandas as pd
 
@@ -93,8 +94,19 @@ def get_intersected_rows(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     return df_intersected
 
 
+def get_cancer_samples_mapping(main_path: str) -> pd.DataFrame:
+    fls = [fl for fl in os.listdir(main_path) if ".csv" in fl]
+    cancer_files = [os.path.join(main_path, fl) for fl in fls if "eda" not in fl]
+    all_cancer_ids = []
+    for fl in cancer_files:
+        df_cancer_ids = pd.read_csv(fl)[['icgc_donor_id', 'icgc_sample_id']].drop_duplicates()
+        df_cancer_ids['cancer_type'] = fl.split("/")[-1].split("\\")[-1].replace("_all_data.csv", "")
+        all_cancer_ids.append(df_cancer_ids)  
+    return pd.concat(all_cancer_ids)  
+
+
 def filter_bad_regions(
-    breakpoints_path: str, bad_regions_path: str, out_path: str
+    breakpoints_path: str, bad_regions_path: str, out_path: str, df_cancer_mapping: pd.DataFrame
 ) -> None:
     """Removes Y chromosome and bad regions from breakpoints data
 
@@ -104,7 +116,7 @@ def filter_bad_regions(
         out_path (str): path to output data with excluded regions
     """
     df_bkpt = (
-        pd.read_csv(breakpoints_path)[["hg38_chr", "hg38_coord"]]
+        pd.read_csv(breakpoints_path)[["hg38_chr", "hg38_coord", 'icgc_donor_id', 'icgc_sample_id']]
         .rename(columns={"hg38_chr": "chr", "hg38_coord": "start"})
         .assign(end=lambda x: x['start'] + 1)
     )
@@ -124,15 +136,24 @@ def filter_bad_regions(
     df_intersected.to_csv("data/tmp.csv")
     df_bkpt_all = pd.merge(df_bkpt, df_intersected, how="left")
     df_bkpt_all = df_bkpt_all[df_bkpt_all["chr_1"].isnull()]
-    df_bkpt_all[["chr", "start", "end"]].to_csv(out_path)
+    print(df_bkpt_all.columns)
+    # add cancer type
+    print(df_bkpt_all.shape[0])
+    df = pd.merge(df_cancer_mapping, df_bkpt_all, on=['icgc_donor_id', 'icgc_sample_id'])
+    print("final shape:", df.shape[0])
+    df[["cancer_type", "chr", "start", "end"]].to_csv(out_path)
     # 468 472
-    print("Number of resulting breakpoints:", df_bkpt_all.shape[0])
+    print("Number of resulting breakpoints:", df.shape[0])
 
 
 if __name__ == "__main__":
     # get_all_bad_regions_list()
+    all_cancers_path = "../cancer_breakpoints_hotspots_prediction/data/raw breakpoints"
+    df_cancers = get_cancer_samples_mapping(all_cancers_path)
+    print(df_cancers.head())
     filter_bad_regions(
         breakpoints_path="data/hg38_breakpoints_wo_err.csv",
         bad_regions_path="data/all_excluded_regions.csv",
         out_path="data/breakpoints_wo_bad_regions.csv",
+        df_cancer_mapping=df_cancers
     )
