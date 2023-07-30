@@ -28,8 +28,8 @@ python src/filter_bad_breakpoints.py
 
 4) Find genome windows of specified length around breakpoint (positive examples) or randomly - uniform by genome and chromosome (negative examples)
 ``` bash
-python src/generate_windows.py --win_len 512
-python src/generate_windows.py --win_len 4000
+python src/generate_windows.py --win_len 512 --run_number 1
+python src/generate_windows.py --win_len 4000 --run_number 2
 ```
 
 5) Get DNA sequences for coordinates using BEDTOOLS - for 512 and 4000 window length 
@@ -43,8 +43,8 @@ bedtools getfasta -fi hg38.fa -bed positive_all_cancers_4000.bed -tab -fo pos_40
 
 6) Collect final dataset with class balance 1:`n_times_neg_more` (positive: negative). Removes excluded regions from negatives
 ``` bash
-python src/create_datasets.py --n_times_neg_more 1 --win_len 512
-python src/create_datasets.py --n_times_neg_more 1 --win_len 4000
+python src/create_datasets.py --n_times_neg_more 1 --win_len 512 --run_number 1
+python src/create_datasets.py --n_times_neg_more 1 --win_len 4000 --run_number 2
 ```
 ## Using code
 

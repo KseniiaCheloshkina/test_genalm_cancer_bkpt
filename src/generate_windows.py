@@ -9,6 +9,19 @@ import tqdm
 import numpy as np
 
 
+def generate_negative_different_length(win_len: int, negative_path: str) -> pd.DataFrame:
+    df = pd.read_csv(negative_path)[['position', 'chromosome', 'label']]
+    all_seq = []
+    for _, bkpt in tqdm.tqdm(df.iterrows()):
+        win_start, win_end = generate_window(
+            chrom=bkpt["chromosome"], pos=int(bkpt["position"]), win_len=win_len
+        )
+        all_seq.append((win_start, win_end))
+    df["win_start"] = [el[0] for el in all_seq]
+    df["win_end"] = [el[1] for el in all_seq]   
+    return df
+    
+    
 def generate_window(chrom: str, pos: int, win_len: int) -> Tuple[int, int]:
     """ Generates window around point taking into account chromosome lengths
 
@@ -79,6 +92,8 @@ def get_negative_windows(n_points: int, win_len: int) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: resulting dataframe
+        ,
+        
     """
     with open("data/chr_lengths.json", "r") as f:
         chr_lengths = json.load(f)
@@ -112,16 +127,30 @@ if __name__ == "__main__":
     parser.add_argument(
         "--win_len", help="length of window to generate", default=512, type=int
     )
+    parser.add_argument(
+        "--run_number", help="order number of window length", default=1, type=int
+    )
     args = parser.parse_args()
-    
     main_path = "data/dataset/"
     # save positive
     df_pos = get_positive_windows(csv_path="data/breakpoints_wo_bad_regions.csv", 
                                   win_len=args.win_len)
     df_pos.to_csv(f"{main_path}positive_all_cancers_{args.win_len}.csv")
-    # generate_negative
-    df_neg = get_negative_windows(n_points=1000000, win_len=args.win_len)
-    df_neg.to_csv(f"{main_path}negative_all_cancers_{args.win_len}.csv")
+    
+    # ATTENTION: do it only 1 time for 1 window length. Datasets with all the rest window lengths
+    # should contains the same set of negative points (and not generating a differet set)
+    # generate_negative - for the first time
+    neg_path = f"{main_path}negative_all_cancers_{args.win_len}.csv"
+    if args.run_number == 1:
+        print("generate new negatives")
+        df_neg = get_negative_windows(n_points=1000000, win_len=args.win_len)
+    else:
+        print("expand existing negatives")
+        # use existing negative set and expand window length
+        df_neg = generate_negative_different_length(
+            win_len=args.win_len, 
+            negative_path=f"{main_path}negative_all_cancers_512.csv")
+    df_neg.to_csv(neg_path)
     
     # save to bed format to finally get DNA sequence
     flnms = [fl for fl in os.listdir(main_path) if fl.endswith(".csv")]
