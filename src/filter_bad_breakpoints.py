@@ -1,3 +1,4 @@
+""" Merges all excluded regions into one file and removes these regions from breakpoints data """
 import os
 import sqlite3
 import pandas as pd
@@ -95,6 +96,12 @@ def get_intersected_rows(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_cancer_samples_mapping(main_path: str) -> pd.DataFrame:
+    """ Get mapping of icgc sample id to cancer type
+    Args:
+        main_path (str): path to directory containing breakpoints data for each cancer type separately
+    Returns:
+        pd.DataFrame: resulting mapping
+    """
     fls = [fl for fl in os.listdir(main_path) if ".csv" in fl]
     cancer_files = [os.path.join(main_path, fl) for fl in fls if "eda" not in fl]
     all_cancer_ids = []

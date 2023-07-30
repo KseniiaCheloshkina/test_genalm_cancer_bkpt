@@ -1,3 +1,4 @@
+""" Generate window arounf breakpoint or random location (positive and negative examples respectively)"""
 import argparse
 import json
 import os
@@ -9,6 +10,16 @@ import numpy as np
 
 
 def generate_window(chrom: str, pos: int, win_len: int) -> Tuple[int, int]:
+    """ Generates window around point taking into account chromosome lengths
+
+    Args:
+        chrom (str): chromosome number
+        pos (int): position (coordinate)
+        win_len (int): window length to generate (total nucleotides)
+
+    Returns:
+        Tuple[int, int]: start-end of window
+    """
     # to check if chromosome is shorter
     with open("data/chr_lengths.json", "r") as f:
         chr_lengths = json.load(f)
@@ -18,13 +29,31 @@ def generate_window(chrom: str, pos: int, win_len: int) -> Tuple[int, int]:
 
 
 def get_sequence(chrom: str, start: str, end: str) -> str:
-    # It takes a lot of time ona big dataset...
+    """ Get DNA sequence by coordinates using API. Good solution only for small number of requests
+    It takes a lot of time on a big dataset...
+    Args:
+        chrom (str): chromosome number
+        start (str): start position of the window
+        end (str): end position of the window
+
+    Returns:
+        str: DNA sequence
+    """
     addr = f"https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr{chrom};start={start};end={end}"
     answ = requests.post(addr).json()["dna"]
     return answ
 
 
 def get_positive_windows(csv_path: str, win_len: int) -> pd.DataFrame:
+    """ For each breakpoint in a file generate window around it and set positive label
+
+    Args:
+        csv_path (str): path to breakpoints data
+        win_len (int): window length
+
+    Returns:
+        pd.DataFrame: resulting DF
+    """
     df = pd.read_csv(csv_path)
     all_seq = []
     for _, bkpt in tqdm.tqdm(df.iterrows()):
@@ -41,6 +70,16 @@ def get_positive_windows(csv_path: str, win_len: int) -> pd.DataFrame:
 
 
 def get_negative_windows(n_points: int, win_len: int) -> pd.DataFrame:
+    """ Generates specified number of negative examples randomly from each chromosome.
+    For each chromosome points are generated uniformly based on its length and excluding telomeres
+
+    Args:
+        n_points (int): number of points to generate
+        win_len (int): window length
+
+    Returns:
+        pd.DataFrame: resulting dataframe
+    """
     with open("data/chr_lengths.json", "r") as f:
         chr_lengths = json.load(f)
     mean_telomeres_len = 10000
