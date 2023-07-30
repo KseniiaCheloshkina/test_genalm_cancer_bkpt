@@ -8,3 +8,4 @@
 *.bed
 venv_bio/*
 *.pyc
+*.fa

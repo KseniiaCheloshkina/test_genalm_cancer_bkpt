@@ -84,14 +84,14 @@ if __name__ == "__main__":
     df_neg = get_negative_windows(n_points=1000000, win_len=args.win_len)
     df_neg.to_csv(f"{main_path}negative_all_cancers_{args.win_len}.csv")
     
-    # save to ved format to finally get DNA sequence
+    # save to bed format to finally get DNA sequence
     flnms = [fl for fl in os.listdir(main_path) if fl.endswith(".csv")]
     for fl in flnms:
         df_windows = pd.read_csv(os.path.join(main_path, fl))
         df_windows['chromosome'] = df_windows['chromosome'].map(lambda x: 'chr' + str(x))
         df_windows[['chromosome', 'win_start', 'win_end']].to_csv(
             os.path.join(main_path, fl.replace(".csv", ".bed")), 
-            sep="\t", 
+            sep="\t",
             header=False,
             index=False
         )

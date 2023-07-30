@@ -60,7 +60,7 @@ def get_intersected_rows(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
         query = f"""
             select * 
             from df1 join df2 on start_1 between start and end
-            where df1.chr = {chr_n} and df2.chr_1 = {chr_n}
+            where df1.chr = '{chr_n}' and df2.chr_1 = '{chr_n}'
             """
         df_intersect = pd.read_sql_query(query, conn)[["index", "index_1"]]
         all_intersections.append(df_intersect)
@@ -69,7 +69,7 @@ def get_intersected_rows(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
         query = f"""
             select * 
             from df1 join df2 on start between start_1 and end_1
-            where df1.chr = {chr_n} and df2.chr_1 = {chr_n}
+            where df1.chr = '{chr_n}' and df2.chr_1 = '{chr_n}'
             """
         df_intersect = pd.read_sql_query(query, conn)[["index", "index_1"]]
         all_intersections.append(df_intersect)
@@ -78,7 +78,7 @@ def get_intersected_rows(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
         query = f"""
             select * 
             from df1 join df2 on end_1 between start and end
-            where df1.chr = {chr_n} and df2.chr_1 = {chr_n}
+            where df1.chr = '{chr_n}' and df2.chr_1 = '{chr_n}'
             """
         df_intersect = pd.read_sql_query(query, conn)[["index", "index_1"]]
         all_intersections.append(df_intersect)
@@ -102,7 +102,7 @@ def get_cancer_samples_mapping(main_path: str) -> pd.DataFrame:
         df_cancer_ids = pd.read_csv(fl)[['icgc_donor_id', 'icgc_sample_id']].drop_duplicates()
         df_cancer_ids['cancer_type'] = fl.split("/")[-1].split("\\")[-1].replace("_all_data.csv", "")
         all_cancer_ids.append(df_cancer_ids)  
-    return pd.concat(all_cancer_ids)  
+    return pd.concat(all_cancer_ids)
 
 
 def filter_bad_regions(
@@ -133,7 +133,6 @@ def filter_bad_regions(
     df_bad_regions['chr'] = df_bad_regions['chr'].map(lambda x: x.replace("chr", ""))
     df_bad_regions['chr'] = df_bad_regions['chr'].astype(str)
     df_intersected = get_intersected_rows(df_bkpt, df_bad_regions)
-    df_intersected.to_csv("data/tmp.csv")
     df_bkpt_all = pd.merge(df_bkpt, df_intersected, how="left")
     df_bkpt_all = df_bkpt_all[df_bkpt_all["chr_1"].isnull()]
     print(df_bkpt_all.columns)
