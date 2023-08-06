@@ -46,6 +46,11 @@ bedtools getfasta -fi hg38.fa -bed positive_all_cancers_4000.bed -tab -fo pos_40
 python src/create_datasets.py --n_times_neg_more 1 --win_len 512 --run_number 1
 python src/create_datasets.py --n_times_neg_more 1 --win_len 4000 --run_number 2
 ```
+
+## Results
+Uterus (4000 nucleotides window length) - 0.51 accuracy while there is perfect class balance (50/50)
+Breast (512 nucleotides window length) 
+
 ## Using code
 
 Run tests:
